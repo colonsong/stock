@@ -37,16 +37,55 @@
         
         
         function get($url) {
+
+            $url = 'http://www.twse.com.tw/exchangeReport/BFIAMU?response=json&date=20201012&_=1702490352800';
+            $cookie_file = __DIR__ . "/".'cookies.txt';
             $ch = curl_init();
+            //curl_setopt($ch, CURLINFO_HEADER_OUT, true);
             
+            
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Host: www.twse.com.tw",
+                "Connection: keep-alive",
+                "Cache-Control: max-age=0",
+                "Upgrade-Insecure-Requests: 1",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "Sec-Fetch-Site: none",
+                "Sec-Fetch-Mode: navigate",
+                "Sec-Fetch-User: ?1",
+                "Sec-Fetch-Dest: document",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Cookie: _ga=GA1.3.1235678433.1598417822; _gid=GA1.3.958185623.1602490345; JSESSIONID=986B1A85531F6CE6AB659CC4697CEE98",
+           
+                
+
+                
+            ]);
+
+          
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_VERBOSE, 0);
+             
+        
+            
             $output = curl_exec($ch);
+
+
+            if (0 != curl_errno($ch)) {
+                echo "Error:\n" . curl_error($ch);
     
-            
+            }
+            $output = gzdecode($output);
+           
             curl_close($ch);
-            
-         
+
+
     
             return json_decode($output, true);
         }
@@ -57,7 +96,7 @@
         <?php $save = [];
         $d;
         $lastymd ;
-        for ($i=0; $i<40; $i++):?>
+        for ($i=0; $i<3; $i++):?>
             <?php 
                 $format = date('m-d-Y');
                 #$format = '08-31-2020';
@@ -71,12 +110,15 @@
                 if ($weekday ==0 || $weekday == 6) {
                     continue;
                 }
-          
-                $array = get($url);
-                
-                $save[$date->format('Y-m-d')] = $array;
-                $lastymd = $date->format('Y-m-d');
               
+        
+                $array = get($url);
+               
+                if (!empty($array)) {
+                    $save[$date->format('Y-m-d')] = $array;
+                    $lastymd = $date->format('Y-m-d');
+                }
+                
             ?>
         <?php endfor;?>
 
