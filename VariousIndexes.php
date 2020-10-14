@@ -38,11 +38,10 @@
         
         function get($url) {
 
-            $url = 'http://www.twse.com.tw/exchangeReport/BFIAMU?response=json&date=20201012&_=1702490352800';
-            $cookie_file = __DIR__ . "/".'cookies.txt';
-            $ch = curl_init();
-            //curl_setopt($ch, CURLINFO_HEADER_OUT, true);
             
+         
+            $ch = curl_init();
+         
             
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 "Host: www.twse.com.tw",
@@ -57,7 +56,7 @@
                 "Sec-Fetch-Dest: document",
                 "Accept-Encoding: gzip, deflate, br",
                 "Accept-Language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-                "Cookie: _ga=GA1.3.1235678433.1598417822; _gid=GA1.3.958185623.1602490345; JSESSIONID=986B1A85531F6CE6AB659CC4697CEE98",
+                "Cookie:  _ga=GA1.3.1748561110.1602687185; _gid=GA1.3.249707272.1602687185; JSESSIONID=56C1B333A9803118D4E77BFE8118AEF7; _gat=1",
            
                 
 
@@ -65,20 +64,22 @@
             ]);
 
           
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
+       
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_VERBOSE, 0);
-             
+         
+            
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+         
         
             
             $output = curl_exec($ch);
 
-
             if (0 != curl_errno($ch)) {
                 echo "Error:\n" . curl_error($ch);
+                sleep(2);
+                get($url);
+                return;
     
             }
             $output = gzdecode($output);
@@ -96,8 +97,9 @@
         <?php $save = [];
         $d;
         $lastymd ;
-        for ($i=0; $i<3; $i++):?>
+        for ($i=0; $i<1; $i++):?>
             <?php 
+            
                 $format = date('m-d-Y');
                 #$format = '08-31-2020';
                 $date = DateTime::createFromFormat('m-d-Y', $format);
@@ -110,7 +112,7 @@
                 if ($weekday ==0 || $weekday == 6) {
                     continue;
                 }
-              
+                sleep(2);
         
                 $array = get($url);
                
